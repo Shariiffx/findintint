@@ -710,19 +710,17 @@ async function getSearchSuggestions(query){
 
 // ====================== LOCAL DATA STORE (fallback + cache) ======================
 function getData(key,def){
-  // Resources always come from memory (never localStorage - files too big)
   if(key==='resources') return window._mongoResources || def;
   try{const v=localStorage.getItem('fit_'+key);return v?JSON.parse(v):def}catch{return def}
 }
 function setData(key,val){
-  // NEVER store resources in localStorage - files are too big (causes QuotaExceededError)
   if(key==='resources') return;
   try{localStorage.setItem('fit_'+key,JSON.stringify(val))}catch(e){console.warn('localStorage full for',key);}
 }
 
 // ====================== INIT & SEED ======================
 async function initData(){
-  // Clear any old resource data stuck in localStorage from previous version
+  // Always clear old resource data from localStorage (files too big, causes QuotaExceededError)
   try{ localStorage.removeItem('fit_resources'); }catch(e){}
   // Seed defaults if never set
   if(!getData('depts_init',false)){
@@ -740,7 +738,7 @@ async function syncFromMongo(){
   try{
     showGlobalLoader(true);
     const [resources, events, queries, users, settings] = await Promise.all([
-      mongoFind('resources',{},{createdAt:-1},500),
+      mongoFind('resources',{},{createdAt:-1},100),
       mongoFind('events',{},{createdAt:-1},100),
       mongoFind('queries',{},{createdAt:-1},200),
       mongoFind('users',{},{},100),
@@ -753,7 +751,7 @@ async function syncFromMongo(){
     if(resources.length){
       window._mongoResources = resources.map(r=>({...r,id:toId(r),_id:undefined}));
       // Only store metadata (no file/base64) in localStorage
-      setData('resources', resources.map(r=>({...r,id:toId(r),_id:undefined,file:undefined})));
+      // resources stored in window._mongoResources only (not localStorage)
     }
     if(events.length) setData('events', events.map(e=>({...e,id:toId(e),_id:undefined})));
     if(queries.length) setData('queries', queries.map(q=>({...q,id:toId(q),_id:undefined})));
@@ -1005,7 +1003,7 @@ async function doUpload(){
     if(result && result.insertedId){
       newRes._id = result.insertedId;
     }
-    // Save to in-memory store (not localStorage - files too big)
+    // Save to memory only (not localStorage - files too big)
     if(!window._mongoResources) window._mongoResources = [];
     window._mongoResources.unshift(newRes);
     document.getElementById('uploadBar').style.width='100%';
