@@ -709,8 +709,12 @@ async function getSearchSuggestions(query){
 }
 
 // ====================== LOCAL DATA STORE (fallback + cache) ======================
-function getData(key,def){try{const v=localStorage.getItem('fit_'+key);return v?JSON.parse(v):def}catch{return def}}
-function setData(key,val){localStorage.setItem('fit_'+key,JSON.stringify(val))}
+function getData(key,def){
+  // FIX: For resources, use in-memory data (has files) if available, else localStorage (metadata only)
+  if(key==='resources' && window._mongoResources && window._mongoResources.length) return window._mongoResources;
+  try{const v=localStorage.getItem('fit_'+key);return v?JSON.parse(v):def}catch{return def}
+}
+function setData(key,val){try{localStorage.setItem('fit_'+key,JSON.stringify(val))}catch(e){console.warn('localStorage full, skipping setData for',key);}}
 
 // ====================== INIT & SEED ======================
 async function initData(){
@@ -722,7 +726,7 @@ async function initData(){
     setData('categories',['Syllabus','Book PDF','CA2 Question','Semester Question','Assignment','Notes','Previous Question','Lab Manual','Academic Calendar','Holiday List','Upcoming Event','Other']);
     setData('depts_init',true);
   }
-  // Always sync from MongoDB on every page load so all devices see latest data
+  // Try to load from MongoDB
   await syncFromMongo();
 }
 
@@ -736,9 +740,15 @@ async function syncFromMongo(){
       mongoFind('users',{},{},100),
       mongoFind('settings',{},{},10)
     ]);
-    // Convert MongoDB _id (ObjectId) to plain string for localStorage compatibility
+    // Convert MongoDB _id to plain string
     const toId = doc => doc.id || (doc._id ? doc._id.toString() : 'id_'+Date.now());
-    if(resources.length) setData('resources', resources.map(r=>({...r,id:toId(r),_id:undefined})));
+    // FIX: Store full resources in memory (window._mongoResources) NOT localStorage
+    // because base64 files cause QuotaExceededError in localStorage (5MB limit)
+    if(resources.length){
+      window._mongoResources = resources.map(r=>({...r,id:toId(r),_id:undefined}));
+      // Only store metadata (no file/base64) in localStorage
+      setData('resources', resources.map(r=>({...r,id:toId(r),_id:undefined,file:undefined})));
+    }
     if(events.length) setData('events', events.map(e=>({...e,id:toId(e),_id:undefined})));
     if(queries.length) setData('queries', queries.map(q=>({...q,id:toId(q),_id:undefined})));
     if(users.length){
@@ -758,12 +768,10 @@ async function syncFromMongo(){
     }
     // Sync settings (depts, sems, years, cats)
     settings.forEach(s=>{if(s.key && s.value) setData(s.key, s.value);});
-    console.log('✅ Synced from MongoDB: resources='+resources.length+' users='+users.length);
   }catch(e){
     console.warn('MongoDB sync failed, using local data',e);
   } finally {
     showGlobalLoader(false);
-    // FIX: Always re-render AFTER data is saved so page shows DB content
     updateHeroStats();
     renderPublicContent();
   }
