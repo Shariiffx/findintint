@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FindInTint – Student Resource Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #C0152A;
+    --red-dark: #8B0D1D;
+    --red-light: #F9E5E8;
+    --red-mid: #E8435A;
+    --red-soft: #FCEEF0;
+    --white: #FFFFFF;
+    --off-white: #FAFAFA;
+    --gray-50: #F7F7F7;
+    --gray-100: #EFEFEF;
+    --gray-200: #E0E0E0;
+    --gray-400: #9E9E9E;
+    --gray-600: #5A5A5A;
+    --gray-700: #404040;
+    --gray-800: #2A2A2A;
+    --shadow-sm: 0 2px 8px rgba(192,21,42,0.08);
+    --shadow-md: 0 4px 20px rgba(192,21,42,0.12);
+    --shadow-lg: 0 8px 40px rgba(192,21,42,0.18);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 20px;
+    --font-head: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font-body);background:var(--off-white);color:var(--gray-800);min-height:100vh}
+  a{text-decoration:none;color:inherit}
+  button{cursor:pointer;font-family:var(--font-body)}
+  input,select,textarea{font-family:var(--font-body)}
+
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:#f1f1f1}
+  ::-webkit-scrollbar-thumb{background:var(--red-mid);border-radius:10px}
+
+  /* ===== KEYFRAMES ===== */
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+  @keyframes fadeOut{from{opacity:1}to{opacity:0;transform:translateY(10px)}}
+  @keyframes pulseRed{0%,100%{box-shadow:0 0 0 0 rgba(192,21,42,0.3)}50%{box-shadow:0 0 0 8px rgba(192,21,42,0)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes scaleIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+  @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  @keyframes countUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes borderGlow{0%,100%{border-color:var(--gray-200)}50%{border-color:var(--red-mid)}}
+  @keyframes logoPop{0%{opacity:0;transform:scale(0.6)}100%{opacity:1;transform:scale(1)}}
+  @keyframes spinRing{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+  @keyframes textFade{0%{opacity:0.6}100%{opacity:1}}
+
+  /* ===== TRANSITION CURTAIN (from demo) ===== */
+  #transition-curtain{position:fixed;top:0;left:0;width:100%;height:100%;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;z-index:10000;transform:translateY(100%);will-change:transform;transition:transform 0.6s cubic-bezier(0.85,0,0.15,1);display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+  .loader-container{position:relative;width:160px;height:160px;display:flex;justify-content:center;align-items:center;margin-bottom:25px;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3))}
+  .loader-ring{position:absolute;top:0;left:0;width:100%;height:100%;border:5px solid rgba(220,38,38,0.2);border-top-color:#dc2626;border-radius:50%;animation:spinRing 0.8s linear infinite}
+  .loader-logo{width:90px;height:auto;filter:none;animation:logoPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards}
+  .loading-text{color:#dc2626;font-weight:800;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.2em;text-shadow:0 2px 4px rgba(255,255,255,0.8),0 0 10px rgba(255,255,255,0.5);animation:textFade 1.5s ease-in-out infinite alternate}
+
+  /* ===== HEADER ===== */
+  .header{background:var(--white);border-bottom:2px solid var(--red-light);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:68px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
+  .header-logos{display:flex;align-items:center;gap:1.5rem}
+  .logo-main{display:flex;align-items:center;gap:0.6rem}
+  .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--red),var(--red-dark));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:-1px;flex-shrink:0;transition:transform var(--transition)}
+  .logo-icon:hover{transform:scale(1.08) rotate(-3deg)}
+  .logo-text{font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--red-dark);letter-spacing:-0.5px}
+  .logo-sub{font-size:10px;color:var(--gray-400);display:block;letter-spacing:1px;text-transform:uppercase;margin-top:-2px}
+  .partner-logos{display:flex;align-items:center;gap:1rem;border-left:1px solid var(--gray-200);padding-left:1.5rem}
+  .partner-logo{display:flex;align-items:center;gap:0.4rem;padding:4px 10px;border-radius:6px;border:1px solid var(--gray-200);font-size:12px;font-weight:600;color:var(--gray-600);white-space:nowrap;transition:all var(--transition)}
+  .partner-logo:hover{border-color:var(--red-light);color:var(--red)}
+  .partner-logo-placeholder{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
+  .header-right{display:flex;align-items:center;gap:0.75rem}
+  .btn-admin-login{padding:7px 18px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:all var(--transition);display:flex;align-items:center;gap:6px}
+  .btn-admin-login:hover{background:var(--red-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(192,21,42,0.3)}
+  .btn-query{padding:7px 18px;background:transparent;color:var(--red);border:1.5px solid var(--red);border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:all var(--transition);display:flex;align-items:center;gap:6px}
+  .btn-query:hover{background:var(--red-soft);transform:translateY(-1px)}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,var(--red-dark) 0%,var(--red) 60%,var(--red-mid) 100%);color:#fff;padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-50%;left:-20%;width:140%;height:200%;background:radial-gradient(ellipse at 70% 40%,rgba(255,255,255,0.07) 0%,transparent 60%);pointer-events:none}
+  .hero::after{content:'';position:absolute;bottom:-30px;left:0;right:0;height:60px;background:var(--off-white);clip-path:ellipse(55% 100% at 50% 100%)}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;margin-bottom:1.5rem;backdrop-filter:blur(4px);animation:fadeInUp 0.6s ease both}
+  .hero h1{font-family:var(--font-head);font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1.1;margin-bottom:1rem;letter-spacing:-1px;animation:fadeInUp 0.7s 0.1s ease both}
+  .hero h1 span{color:rgba(255,255,255,0.75)}
+  .hero p{font-size:1.05rem;opacity:0.85;max-width:550px;margin:0 auto 2rem;line-height:1.7;animation:fadeInUp 0.7s 0.2s ease both}
+  .hero-search{display:flex;max-width:540px;margin:0 auto;background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg);animation:fadeInUp 0.7s 0.3s ease both;border:2px solid transparent;transition:border-color var(--transition)}
+  .hero-search:focus-within{border-color:rgba(255,255,255,0.5);box-shadow:0 8px 40px rgba(0,0,0,0.25),0 0 0 3px rgba(255,255,255,0.2)}
+  .hero-search input{flex:1;border:none;outline:none;padding:14px 18px;font-size:14px;color:var(--gray-800)}
+  .hero-search button{background:var(--red);color:#fff;border:none;padding:14px 22px;font-size:14px;font-weight:600;transition:background var(--transition);white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .hero-search button:hover{background:var(--red-dark)}
+  .search-clear-btn{background:none;border:none;padding:14px 10px;color:var(--gray-400);font-size:18px;cursor:pointer;transition:color var(--transition);display:none}
+  .search-clear-btn:hover{color:var(--red)}
+  .hero-stats{display:flex;justify-content:center;gap:2.5rem;margin-top:2.5rem;flex-wrap:wrap;animation:fadeInUp 0.7s 0.4s ease both}
+  .hero-stat{text-align:center}
+  .hero-stat-num{font-family:var(--font-head);font-size:1.8rem;font-weight:900}
+  .hero-stat-label{font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:1px}
+
+  /* ===== NAV TABS ===== */
+  .nav-tabs{background:var(--white);border-bottom:2px solid var(--gray-100);display:flex;gap:0;overflow-x:auto;padding:0 1.5rem;scrollbar-width:none;position:sticky;top:68px;z-index:90;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+  .nav-tabs::-webkit-scrollbar{display:none}
+  .nav-tab{display:flex;align-items:center;gap:7px;padding:0 1.25rem;height:52px;font-size:13px;font-weight:500;color:var(--gray-600);border:none;background:none;border-bottom:3px solid transparent;transition:all var(--transition);white-space:nowrap;cursor:pointer;position:relative}
+  .nav-tab::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:3px;background:var(--red);transform:scaleX(0);transition:transform var(--transition);border-radius:2px}
+  .nav-tab:hover{color:var(--red);background:var(--red-soft)}
+  .nav-tab.active{color:var(--red);font-weight:600}
+  .nav-tab.active::after{transform:scaleX(1)}
+  .nav-tab-icon{display:flex;align-items:center;justify-content:center;width:18px;height:18px;flex-shrink:0}
+  .nav-tab-icon svg{width:16px;height:16px}
+
+  /* ===== MAIN ===== */
+  .main{max-width:1300px;margin:0 auto;padding:2rem 1.5rem}
+
+  /* ===== FILTER BAR ===== */
+  .filter-bar{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;box-shadow:var(--shadow-sm);animation:fadeInUp 0.4s ease both}
+  .filter-label{font-size:12px;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.5px;margin-right:0.25rem}
+  .filter-select{padding:8px 32px 8px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px;color:var(--gray-800);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239E9E9E' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center/16px;appearance:none;outline:none;transition:border var(--transition);min-width:130px;cursor:pointer}
+  .filter-select:focus{border-color:var(--red)}
+  .filter-select:hover{border-color:var(--gray-400)}
+  .btn-filter{padding:8px 18px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:all var(--transition);display:flex;align-items:center;gap:6px}
+  .btn-filter:hover{background:var(--red-dark);transform:translateY(-1px)}
+  .btn-filter-clear{padding:8px 14px;background:transparent;color:var(--gray-600);border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:13px;font-weight:500;transition:all var(--transition);display:flex;align-items:center;gap:5px}
+  .btn-filter-clear:hover{border-color:var(--red);color:var(--red)}
+
+  /* ===== SECTION HEADER ===== */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+  .section-title{font-family:var(--font-head);font-size:1.4rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:0.6rem}
+  .section-title .icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--red-soft);border-radius:8px;flex-shrink:0}
+  .section-title .icon svg{width:16px;height:16px;stroke:var(--red)}
+  .section-count{background:var(--red-soft);color:var(--red);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700}
+
+  /* ===== CARDS GRID ===== */
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+  .resource-card{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:1.25rem;transition:all var(--transition);position:relative;overflow:hidden;animation:scaleIn 0.35s ease both}
+  .resource-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--red-mid));opacity:0;transition:opacity var(--transition)}
+  .resource-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:var(--red-light)}
+  .resource-card:hover::before{opacity:1}
+  .card-type-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.5px}
+  .badge-syllabus{background:#FFF3E0;color:#E65100}
+  .badge-book{background:#E8F5E9;color:#1B5E20}
+  .badge-question{background:#E3F2FD;color:#0D47A1}
+  .badge-assignment{background:#F3E5F5;color:#4A148C}
+  .badge-notes{background:#E0F2F1;color:#004D40}
+  .badge-lab{background:#FBE9E7;color:#BF360C}
+  .badge-calendar{background:#FCE4EC;color:#880E4F}
+  .badge-holiday{background:#E8EAF6;color:#1A237E}
+  .badge-event{background:#FFFDE7;color:#F57F17}
+  .badge-other{background:var(--gray-100);color:var(--gray-600)}
+  .card-title{font-size:15px;font-weight:600;color:var(--gray-800);margin-bottom:0.5rem;line-height:1.4}
+  .card-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+  .card-tag{background:var(--red-soft);color:var(--red);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500}
+  .card-date{font-size:11px;color:var(--gray-400);margin-bottom:0.75rem;display:flex;align-items:center;gap:5px}
+  .card-date svg{width:12px;height:12px;stroke:var(--gray-400)}
+  .card-desc{font-size:12px;color:var(--gray-600);line-height:1.5;margin-bottom:1rem}
+  .btn-download{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:all var(--transition)}
+  .btn-download:hover{background:var(--red-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(192,21,42,0.25)}
+  .btn-download-outline{background:transparent;color:var(--red);border:1.5px solid var(--red)}
+  .btn-download-outline:hover{background:var(--red-soft)}
+
+  /* ===== CATEGORY CARDS ===== */
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:2rem}
+  .cat-card{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden}
+  .cat-card::after{content:'';position:absolute;inset:0;background:var(--red);opacity:0;transition:opacity 0.2s}
+  .cat-card:hover{border-color:var(--red);box-shadow:var(--shadow-sm);transform:translateY(-3px)}
+  .cat-card:hover .cat-icon-wrap{background:var(--red);transform:scale(1.1)}
+  .cat-card:hover .cat-icon-wrap svg{stroke:#fff}
+  .cat-card.active{border-color:var(--red);background:var(--red-soft)}
+  .cat-icon-wrap{width:48px;height:48px;background:var(--red-soft);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 0.65rem;transition:all var(--transition)}
+  .cat-icon-wrap svg{width:24px;height:24px;stroke:var(--red);transition:stroke var(--transition)}
+  .cat-name{font-size:13px;font-weight:600;color:var(--gray-800)}
+  .cat-count{font-size:11px;color:var(--gray-400);margin-top:2px}
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state{text-align:center;padding:4rem 2rem;color:var(--gray-400);animation:fadeIn 0.4s ease}
+  .empty-state-icon{width:64px;height:64px;background:var(--gray-100);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+  .empty-state-icon svg{width:32px;height:32px;stroke:var(--gray-400)}
+  .empty-state h3{font-size:1.1rem;font-weight:600;color:var(--gray-600);margin-bottom:0.5rem}
+  .empty-state p{font-size:14px;line-height:1.6}
+
+  /* ===== MODAL ===== */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
+  .modal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
+  .modal{background:var(--white);border-radius:var(--radius-lg);padding:0;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.25);animation:scaleIn 0.3s ease}
+  .modal-header{padding:1.5rem 1.5rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-100)}
+  .modal-title{font-family:var(--font-head);font-size:1.3rem;font-weight:700;color:var(--gray-800)}
+  .modal-close{background:none;border:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;color:var(--gray-400);cursor:pointer;transition:all var(--transition)}
+  .modal-close:hover{background:var(--gray-100);color:var(--gray-800)}
+  .modal-close svg{width:18px;height:18px}
+  .modal-body{padding:1.5rem}
+
+  /* ===== FORMS ===== */
+  .form-group{margin-bottom:1.25rem}
+  .form-label{display:block;font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:0.4rem}
+  .form-input{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:14px;color:var(--gray-800);outline:none;transition:border var(--transition),box-shadow var(--transition);background:#fff}
+  .form-input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(192,21,42,0.08)}
+  .form-input::placeholder{color:var(--gray-400)}
+  .form-select{width:100%;padding:10px 36px 10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:14px;color:var(--gray-800);outline:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239E9E9E' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/16px;appearance:none;cursor:pointer;transition:border var(--transition)}
+  .form-select:focus{border-color:var(--red)}
+  .form-textarea{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:14px;color:var(--gray-800);outline:none;resize:vertical;min-height:90px;background:#fff;transition:border var(--transition)}
+  .form-textarea:focus{border-color:var(--red)}
+  .form-file{width:100%;padding:10px 14px;border:1.5px dashed var(--gray-200);border-radius:var(--radius-sm);font-size:13px;color:var(--gray-600);background:#fafafa;cursor:pointer;transition:border var(--transition)}
+  .form-file:focus{border-color:var(--red);outline:none}
+  .btn-primary{width:100%;padding:12px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;transition:all var(--transition);display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-primary:hover{background:var(--red-dark);transform:translateY(-1px);box-shadow:0 4px 16px rgba(192,21,42,0.3)}
+  .btn-secondary{width:100%;padding:12px;background:var(--white);color:var(--red);border:1.5px solid var(--red);border-radius:var(--radius-sm);font-size:14px;font-weight:600;transition:all var(--transition);margin-top:0.75rem;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-secondary:hover{background:var(--red-soft)}
+
+  /* ===== ADMIN ===== */
+  .admin-layout{display:flex;min-height:calc(100vh - 68px)}
+  .admin-sidebar{width:240px;background:var(--gray-800);color:#fff;padding:1.5rem 0;flex-shrink:0;position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto}
+  .admin-sidebar-header{padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:1rem}
+  .admin-avatar{width:42px;height:42px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:0.5rem}
+  .admin-avatar svg{width:22px;height:22px;stroke:#fff}
+  .admin-name{font-size:14px;font-weight:600}
+  .admin-role{font-size:11px;opacity:0.5;text-transform:uppercase;letter-spacing:1px}
+  .admin-nav-item{display:flex;align-items:center;gap:10px;padding:10px 1.5rem;font-size:13px;font-weight:500;color:rgba(255,255,255,0.65);cursor:pointer;transition:all var(--transition);border:none;background:none;width:100%;text-align:left}
+  .admin-nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
+  .admin-nav-item.active{background:var(--red);color:#fff}
+  .admin-nav-icon{display:flex;align-items:center;justify-content:center;width:20px;height:20px;flex-shrink:0}
+  .admin-nav-icon svg{width:16px;height:16px}
+  .admin-nav-section{padding:0.75rem 1.5rem 0.25rem;font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px}
+  .admin-content{flex:1;padding:2rem;background:var(--gray-50);overflow-y:auto}
+  .admin-page-title{font-family:var(--font-head);font-size:1.6rem;font-weight:700;color:var(--gray-800);margin-bottom:0.5rem}
+  .admin-page-sub{font-size:14px;color:var(--gray-400);margin-bottom:2rem}
+  .admin-cards-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
+  .admin-stat-card{background:var(--white);border-radius:var(--radius);padding:1.25rem;border:1px solid var(--gray-100);transition:all var(--transition)}
+  .admin-stat-card:hover{box-shadow:var(--shadow-sm);transform:translateY(-2px)}
+  .admin-stat-num{font-family:var(--font-head);font-size:2rem;font-weight:900;color:var(--red)}
+  .admin-stat-label{font-size:12px;color:var(--gray-400);margin-top:2px}
+  .admin-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .admin-table th{background:var(--gray-50);padding:12px 16px;text-align:left;font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--gray-100)}
+  .admin-table td{padding:12px 16px;border-bottom:1px solid var(--gray-50);font-size:13px;color:var(--gray-700)}
+  .admin-table tr:last-child td{border-bottom:none}
+  .admin-table tr:hover td{background:var(--red-soft)}
+  .btn-table{padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all var(--transition)}
+  .btn-table-danger{background:#FFF0F0;color:var(--red)}
+  .btn-table-danger:hover{background:var(--red);color:#fff}
+  .btn-table-edit{background:var(--gray-100);color:var(--gray-700)}
+  .btn-table-edit:hover{background:var(--gray-200)}
+  .btn-table-add{padding:8px 18px;background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--transition);display:flex;align-items:center;gap:6px}
+  .btn-table-add:hover{background:var(--red-dark)}
+
+  /* ===== CHAT / QUERIES ===== */
+  .chat-container{max-width:800px;margin:0 auto}
+  .chat-thread{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem;box-shadow:var(--shadow-sm);transition:box-shadow var(--transition)}
+  .chat-thread:hover{box-shadow:var(--shadow-md)}
+  .chat-thread-header{padding:1rem 1.25rem;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+  .chat-thread-meta{display:flex;flex-wrap:wrap;gap:6px}
+  .chat-msg{padding:1rem 1.25rem;border-bottom:1px solid var(--gray-50)}
+  .chat-msg:last-child{border-bottom:none}
+  .chat-msg-user{background:var(--red-soft)}
+  .chat-msg-admin{background:var(--gray-50)}
+  .chat-msg-author{font-size:12px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+  .chat-msg-author svg{width:13px;height:13px}
+  .chat-msg-author.user-author{color:var(--red)}
+  .chat-msg-author.admin-author{color:var(--gray-600)}
+  .chat-msg-text{font-size:14px;line-height:1.6}
+  .chat-msg-time{font-size:11px;color:var(--gray-400);margin-top:4px}
+  .status-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .status-open{background:#FFF3E0;color:#E65100}
+  .status-answered{background:#E8F5E9;color:#2E7D32}
+  .status-closed{background:var(--gray-100);color:var(--gray-600)}
+
+  /* ===== TOAST ===== */
+  .toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem}
+  .toast{padding:12px 18px;background:var(--gray-800);color:#fff;border-radius:var(--radius-sm);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;animation:slideInRight 0.3s ease;max-width:320px}
+  .toast svg{width:16px;height:16px;flex-shrink:0}
+  .toast.success{background:#1B5E20}
+  .toast.error{background:var(--red-dark)}
+
+  /* ===== EVENTS ===== */
+  .event-card{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;transition:all var(--transition);box-shadow:var(--shadow-sm)}
+  .event-card:hover{border-color:var(--red-light);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .event-date-box{background:var(--red);color:#fff;border-radius:var(--radius-sm);padding:0.5rem 0.75rem;text-align:center;min-width:52px;flex-shrink:0}
+  .event-day{font-family:var(--font-head);font-size:1.5rem;font-weight:900;line-height:1}
+  .event-month{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:0.85}
+  .event-info-title{font-size:15px;font-weight:600;margin-bottom:4px}
+  .event-info-meta{font-size:12px;color:var(--gray-400);display:flex;align-items:center;gap:4px}
+  .event-info-meta svg{width:12px;height:12px;stroke:var(--gray-400)}
+
+  /* ===== LOGIN ===== */
+  .login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--red-dark),var(--red));padding:1rem}
+  .login-card{background:var(--white);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:scaleIn 0.4s ease}
+  .login-logo{text-align:center;margin-bottom:2rem}
+  .login-logo-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--red),var(--red-dark));border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:26px;font-weight:900;color:#fff;margin:0 auto 0.75rem}
+  .login-logo h2{font-family:var(--font-head);font-size:1.5rem;color:var(--gray-800)}
+  .login-logo p{font-size:13px;color:var(--gray-400);margin-top:2px}
+  .login-error{background:#FFF0F0;color:var(--red);padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1rem;border:1px solid var(--red-light)}
+
+  /* ===== DEPT PILLS ===== */
+  .dept-pill{padding:8px 18px;background:var(--white);border:1.5px solid var(--gray-200);border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--transition)}
+  .dept-pill:hover{border-color:var(--red);color:var(--red);transform:translateY(-1px)}
+  .dept-pill.active{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+
+  /* ===== ACCORDION ===== */
+  .accordion{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);margin-bottom:0.75rem;overflow:hidden;box-shadow:var(--shadow-sm)}
+  .accordion-header{padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:14px;font-weight:600;color:var(--gray-800);transition:background var(--transition)}
+  .accordion-header:hover{background:var(--red-soft)}
+  .accordion-arrow{transition:transform 0.3s;color:var(--red);display:flex;align-items:center}
+  .accordion-arrow svg{width:18px;height:18px}
+  .accordion-body{padding:0 1.25rem 1.25rem;display:none}
+  .accordion.open .accordion-body{display:block}
+  .accordion.open .accordion-arrow{transform:rotate(180deg)}
+  .accordion.open .accordion-header{background:var(--red-soft)}
+
+  /* ===== ALERT ===== */
+  .alert{padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1rem;border-left:3px solid;display:flex;align-items:flex-start;gap:8px}
+  .alert svg{width:15px;height:15px;flex-shrink:0;margin-top:1px}
+  .alert-info{background:#E3F2FD;border-color:#1565C0;color:#0D47A1}
+  .alert-info svg{stroke:#0D47A1}
+  .alert-success{background:#E8F5E9;border-color:#2E7D32;color:#1B5E20}
+
+  /* ===== PAGES ===== */
+  .page{display:none}
+  .page.active{display:block}
+
+  /* ===== SEARCH RESULTS HIGHLIGHT ===== */
+  .search-result-bar{background:linear-gradient(90deg,var(--red-soft),transparent);border-radius:var(--radius);padding:0.75rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;border-left:3px solid var(--red);animation:fadeInUp 0.3s ease}
+  .search-result-text{font-size:13px;font-weight:600;color:var(--gray-700)}
+  .search-result-text span{color:var(--red)}
+
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    .header{padding:0 1rem}
+    .partner-logos{display:none}
+    .hero{padding:2.5rem 1rem 2rem}
+    .admin-layout{flex-direction:column}
+    .admin-sidebar{width:100%;height:auto;position:static;padding:0}
+    .admin-sidebar-header{display:none}
+    .admin-nav-section{display:none}
+    .admin-content{padding:1rem}
+    .cards-grid{grid-template-columns:1fr}
+    .cat-grid{grid-template-columns:repeat(3,1fr)}
+    .filter-bar{gap:0.5rem}
+    .nav-tab{padding:0 0.75rem;font-size:12px}
+  }
+  @media(max-width:480px){
+    .cat-grid{grid-template-columns:repeat(2,1fr)}
+    .header-right .btn-query{display:none}
+    .hero h1{font-size:1.8rem}
+  }
+
+  /* Staggered card animations */
+  .cards-grid .resource-card:nth-child(1){animation-delay:0.05s}
+  .cards-grid .resource-card:nth-child(2){animation-delay:0.10s}
+  .cards-grid .resource-card:nth-child(3){animation-delay:0.15s}
+  .cards-grid .resource-card:nth-child(4){animation-delay:0.20s}
+  .cards-grid .resource-card:nth-child(5){animation-delay:0.25s}
+  .cards-grid .resource-card:nth-child(6){animation-delay:0.30s}
+</style>
+</head>
+<body>
+
+<!-- SVG ICON DEFS (hidden) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="ic-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="ic-syllabus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></symbol>
+    <symbol id="ic-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+    <symbol id="ic-question" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="ic-assignment" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+    <symbol id="ic-notes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></symbol>
+    <symbol id="ic-lab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11l-5 5h16l-5-5V3"/></symbol>
+    <symbol id="ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="ic-events" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="ic-queries" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="ic-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="ic-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+    <symbol id="ic-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+    <symbol id="ic-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="ic-dept" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="ic-graduate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></symbol>
+    <symbol id="ic-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+    <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="ic-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+    <symbol id="ic-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="ic-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="ic-reply" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></symbol>
+    <symbol id="ic-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="ic-arrow-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+    <symbol id="ic-sem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="12" y2="11"/></symbol>
+    <symbol id="ic-new" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+    <symbol id="ic-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="ic-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+    <symbol id="ic-time" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  </defs>
+</svg>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="loginPage" class="login-page" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">F</div>
+      <h2>FindInTint</h2>
+      <p>Admin Portal</p>
+    </div>
+    <div id="loginError" class="login-error" style="display:none"></div>
+    <div class="form-group">
+      <label class="form-label">User ID</label>
+      <input class="form-input" id="loginId" placeholder="Enter your User ID" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" id="loginPwd" type="password" placeholder="Enter your Password" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">
+      <svg width="16" height="16"><use href="#ic-user"/></svg> Sign In
+    </button>
+    <button class="btn-secondary" onclick="showPublicSite()">
+      <svg width="16" height="16"><use href="#ic-arrow-back"/></svg> Back to Website
+    </button>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="adminPanel" style="display:none">
+  <div class="header">
+    <div class="header-logos">
+      <div class="logo-main">
+        <div class="logo-icon">F</div>
+        <div>
+          <span class="logo-text">FindInTint</span>
+          <span class="logo-sub">Admin Panel</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span id="adminWelcome" style="font-size:13px;color:var(--gray-600)"></span>
+      <button class="btn-admin-login" onclick="doLogout()">
+        <svg width="14" height="14"><use href="#ic-logout"/></svg> Logout
+      </button>
+    </div>
+  </div>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-avatar"><svg><use href="#ic-user"/></svg></div>
+        <div class="admin-name" id="sidebarName">Admin</div>
+        <div class="admin-role" id="sidebarRole">Super Admin</div>
+      </div>
+      <div class="admin-nav-section">Dashboard</div>
+      <button class="admin-nav-item active" data-panel="dashboard" onclick="showAdminPanel('dashboard',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-dashboard"/></svg></span> Dashboard
+      </button>
+      <div class="admin-nav-section">Content</div>
+      <button class="admin-nav-item" data-panel="upload" onclick="showAdminPanel('upload',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-upload"/></svg></span> Upload Resource
+      </button>
+      <button class="admin-nav-item" data-panel="resources" onclick="showAdminPanel('resources',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-folder"/></svg></span> Manage Resources
+      </button>
+      <button class="admin-nav-item" data-panel="events" onclick="showAdminPanel('events',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-calendar"/></svg></span> Events & Calendar
+      </button>
+      <button class="admin-nav-item" data-panel="queries" onclick="showAdminPanel('queries',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-queries"/></svg></span> Student Queries
+      </button>
+      <div class="admin-nav-section" id="saMgmtSection">Management</div>
+      <button class="admin-nav-item" id="navDepts" data-panel="depts" onclick="showAdminPanel('depts',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-dept"/></svg></span> Departments
+      </button>
+      <button class="admin-nav-item" id="navSems" data-panel="sems" onclick="showAdminPanel('sems',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-sem"/></svg></span> Semesters
+      </button>
+      <button class="admin-nav-item" id="navYears" data-panel="years" onclick="showAdminPanel('years',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-graduate"/></svg></span> Years
+      </button>
+      <button class="admin-nav-item" id="navUsers" data-panel="users" onclick="showAdminPanel('users',this)">
+        <span class="admin-nav-icon"><svg><use href="#ic-users"/></svg></span> Manage Users
+      </button>
+    </div>
+    <div class="admin-content" id="adminContentArea"></div>
+  </div>
+</div>
+
+<!-- ===== PUBLIC SITE ===== -->
+<div id="publicSite">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logos">
+      <div class="logo-main">
+        <div class="logo-icon">F</div>
+        <div>
+          <span class="logo-text">FindInTint</span>
+          <span class="logo-sub">Student Resource Portal</span>
+        </div>
+      </div>
+      <div class="partner-logos">
+        <a href="https://bpp.com" target="_blank" class="partner-logo">
+          <div class="partner-logo-placeholder" style="background:#C0152A">B</div>
+          B++ Mac
+        </a>
+        <a href="#" class="partner-logo">
+          <div class="partner-logo-placeholder" style="background:#1a1a2e">BG</div>
+          Big Group
+        </a>
+        <div class="partner-logo">
+          <div class="partner-logo-placeholder" style="background:#2d6a4f">T</div>
+          Tint
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-query" onclick="openQueryModal()">
+        <svg width="14" height="14"><use href="#ic-queries"/></svg> Ask Query
+      </button>
+      <button class="btn-admin-login" onclick="showLoginPage()">
+        <svg width="14" height="14"><use href="#ic-user"/></svg> Admin Login
+      </button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero" id="heroSection">
+    <div class="hero-badge">
+      <svg width="13" height="13"><use href="#ic-graduate"/></svg> Your Academic Hub
+    </div>
+    <h1>Find Everything<br><span>You Need to Succeed</span></h1>
+    <p>Access syllabus, books, notes, question papers, assignments and more — all in one place, organized by department and semester.</p>
+    <div class="hero-search">
+      <input type="text" id="heroSearch" placeholder="Search resources, notes, books..." oninput="liveSearch(this.value)" onkeydown="if(event.key==='Enter')triggerSearch()">
+      <button id="searchClearBtn" class="search-clear-btn" onclick="clearSearch()" style="display:none">
+        <svg width="16" height="16"><use href="#ic-x"/></svg>
+      </button>
+      <button onclick="triggerSearch()">
+        <svg width="16" height="16"><use href="#ic-search"/></svg> Search
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num" id="statResources">0</div><div class="hero-stat-label">Resources</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="statDepts">0</div><div class="hero-stat-label">Departments</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="statSems">0</div><div class="hero-stat-label">Semesters</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="statStudents">1K+</div><div class="hero-stat-label">Students</div></div>
+    </div>
+  </div>
+
+  <!-- NAV TABS -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchPublicTab('home',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-home"/></svg></span> Home
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('syllabus',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-syllabus"/></svg></span> Syllabus
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('books',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-book"/></svg></span> Books
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('questions',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-question"/></svg></span> Question Papers
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('assignments',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-assignment"/></svg></span> Assignments
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('notes',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-notes"/></svg></span> Notes
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('lab',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-lab"/></svg></span> Lab Manual
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('calendar',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-calendar"/></svg></span> Calendar
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('events',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-events"/></svg></span> Events
+    </button>
+    <button class="nav-tab" onclick="switchPublicTab('queries',this)">
+      <span class="nav-tab-icon"><svg><use href="#ic-queries"/></svg></span> Queries
+    </button>
+  </div>
+
+  <!-- PUBLIC CONTENT -->
+  <div class="main" id="publicContent"></div>
+</div>
+
+<!-- TRANSITION CURTAIN (from demo) -->
+<div id="transition-curtain">
+  <div class="loader-container">
+    <div class="loader-ring"></div>
+    <img src="https://upload.wikimedia.org/wikipedia/en/e/ed/Techno_International_New_Town_Logo.png" class="loader-logo" alt="Logo">
+  </div>
+  <span class="loading-text">Loading...</span>
+</div>
+
+<!-- QUERY MODAL -->
+<div class="modal-overlay" id="queryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Ask a Query</div>
+      <button class="modal-close" onclick="closeQueryModal()"><svg><use href="#ic-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input class="form-input" id="qName" placeholder="Enter your name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Department</label>
+        <select class="form-select" id="qDept"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subject / Topic</label>
+        <input class="form-input" id="qSubject" placeholder="E.g. Assignment submission, Syllabus doubt...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Message</label>
+        <textarea class="form-textarea" id="qMessage" placeholder="Describe your query in detail..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="submitQuery()">
+        <svg width="16" height="16"><use href="#ic-send"/></svg> Submit Query
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== CONFIG ======================
+// Auto-detect: uses same origin in production (Render), localhost in dev
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3000/api'
+  : '/api';
+
+// ====================== MONGODB API HELPER ======================
+async function mongoFind(collection, filter={}, sort={}, limit=200){
+  try{
+    const r=await fetch(API_BASE+'/find',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({collection,filter,sort,limit})
+    });
+    const d=await r.json();
+    return d.documents||[];
+  }catch(e){console.error('mongoFind error',e);return[];}
+}
+
+async function mongoInsertOne(collection, document){
+  try{
+    const r=await fetch(API_BASE+'/insertOne',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({collection,document})
+    });
+    return await r.json();
+  }catch(e){console.error('mongoInsertOne error',e);return null;}
+}
+
+async function mongoDeleteOne(collection, filter){
+  try{
+    const r=await fetch(API_BASE+'/deleteOne',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({collection,filter})
+    });
+    return await r.json();
+  }catch(e){console.error('mongoDeleteOne error',e);return null;}
+}
+
+async function mongoUpdateOne(collection, filter, update, opts={}){
+  try{
+    const r=await fetch(API_BASE+'/updateOne',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({collection,filter,update,upsert:opts.upsert||false})
+    });
+    return await r.json();
+  }catch(e){console.error('mongoUpdateOne error',e);return null;}
+}
+
+// ====================== CLAUDE AI HELPER (for search suggestions) ======================
+async function getSearchSuggestions(query){
+  const resources = getData('resources',[]);
+  const titles = resources.map(r=>r.title).slice(0,30);
+  const depts = getData('depts',[]);
+  const cats = getData('categories',[]);
+  // Build suggestions locally from cached data
+  const q = query.toLowerCase();
+  const suggestions = [];
+  // Match from resource titles
+  resources.forEach(r=>{
+    if((r.title||'').toLowerCase().includes(q) && suggestions.length<5){
+      suggestions.push({text:r.title, type:'resource', badge:r.type});
+    }
+  });
+  // Match from departments
+  depts.forEach(d=>{
+    if(d.toLowerCase().includes(q) && suggestions.length<7){
+      suggestions.push({text:d, type:'department', badge:'Dept'});
+    }
+  });
+  // Match from categories
+  cats.forEach(c=>{
+    if(c.toLowerCase().includes(q) && suggestions.length<8){
+      suggestions.push({text:c, type:'category', badge:'Type'});
+    }
+  });
+  return suggestions.slice(0,6);
+}
+
+// ====================== LOCAL DATA STORE (fallback + cache) ======================
+function getData(key,def){try{const v=localStorage.getItem('fit_'+key);return v?JSON.parse(v):def}catch{return def}}
+function setData(key,val){localStorage.setItem('fit_'+key,JSON.stringify(val))}
+
+// ====================== INIT & SEED ======================
+async function initData(){
+  // Seed defaults if never set
+  if(!getData('depts_init',false)){
+    setData('depts',['Computer Science','Information Technology','Electronics','Mechanical','Civil','BCA','MCA']);
+    setData('sems',['Semester 1','Semester 2','Semester 3','Semester 4','Semester 5','Semester 6','Semester 7','Semester 8']);
+    setData('years',['1st Year','2nd Year','3rd Year','4th Year']);
+    setData('categories',['Syllabus','Book PDF','CA2 Question','Semester Question','Assignment','Notes','Previous Question','Lab Manual','Academic Calendar','Holiday List','Upcoming Event','Other']);
+    setData('depts_init',true);
+  }
+  // Try to load from MongoDB
+  await syncFromMongo();
+}
+
+async function syncFromMongo(){
+  try{
+    showGlobalLoader(true);
+    const [resources, events, queries, users, settings] = await Promise.all([
+      mongoFind('resources',{},{createdAt:-1},500),
+      mongoFind('events',{},{createdAt:-1},100),
+      mongoFind('queries',{},{createdAt:-1},200),
+      mongoFind('users',{},{},100),
+      mongoFind('settings',{},{},10)
+    ]);
+    // FIX: Convert MongoDB _id (ObjectId) to plain string for localStorage compatibility
+    const toId = doc => doc.id || (doc._id ? doc._id.toString() : 'id_'+Date.now());
+    if(resources.length) setData('resources', resources.map(r=>({...r,id:toId(r),_id:undefined})));
+    if(events.length) setData('events', events.map(e=>({...e,id:toId(e),_id:undefined})));
+    if(queries.length) setData('queries', queries.map(q=>({...q,id:toId(q),_id:undefined})));
+    if(users.length){
+      // Always ensure superadmin exists locally
+      const hasSA = users.find(u=>u.userId==='superadmin');
+      const mappedUsers = users.map(u=>({...u,id:toId(u),_id:undefined}));
+      if(!hasSA) mappedUsers.unshift({id:'u1',userId:'superadmin',password:'admin123',name:'Super Admin',role:'superadmin',dept:'All',active:true});
+      setData('users', mappedUsers);
+    } else {
+      // No users in DB at all — seed superadmin once
+      const existing = getData('users',[]);
+      if(!existing.find(u=>u.userId==='superadmin')){
+        const sa = {id:'u1',userId:'superadmin',password:'admin123',name:'Super Admin',role:'superadmin',dept:'All',active:true,createdAt:new Date().toISOString()};
+        setData('users',[sa]);
+        await mongoInsertOne('users', sa);
+      }
+    }
+    // Sync settings (depts, sems, years, cats)
+    settings.forEach(s=>{if(s.key && s.value) setData(s.key, s.value);});
+  }catch(e){
+    console.warn('MongoDB sync failed, using local data',e);
+  } finally {
+    showGlobalLoader(false);
+    updateHeroStats();
+    renderPublicContent();
+  }
+}
+
+function showGlobalLoader(show){
+  let el = document.getElementById('globalLoader');
+  if(show){
+    if(!el){
+      el=document.createElement('div');
+      el.id='globalLoader';
+      el.style.cssText='position:fixed;bottom:1.5rem;left:1.5rem;background:var(--gray-800);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:9998;display:flex;align-items:center;gap:8px;animation:slideInRight 0.3s ease';
+      el.innerHTML='<div style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite"></div> Syncing with database...';
+      document.body.appendChild(el);
+    }
+  } else {
+    if(el) el.remove();
+  }
+}
+
+// ====================== AUTH ======================
+let currentUser=null;
+
+function doLogin(){
+  const id=document.getElementById('loginId').value.trim();
+  const pwd=document.getElementById('loginPwd').value.trim();
+  const users=getData('users',[]);
+  const user=users.find(u=>u.userId===id&&u.password===pwd&&u.active);
+  if(user){
+    currentUser=user;
+    document.getElementById('loginError').style.display='none';
+    showAdminPanelUI();
+  }else{
+    document.getElementById('loginError').style.display='block';
+    document.getElementById('loginError').textContent='Invalid credentials. Please try again.';
+  }
+}
+
+function doLogout(){
+  currentUser=null;
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('publicSite').style.display='block';
+  showToast('Logged out successfully','success');
+}
+
+function showLoginPage(){
+  document.getElementById('publicSite').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('adminPanel').style.display='none';
+}
+function showPublicSite(){
+  document.getElementById('publicSite').style.display='block';
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('adminPanel').style.display='none';
+}
+
+function showAdminPanelUI(){
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('adminPanel').style.display='block';
+  document.getElementById('publicSite').style.display='none';
+  document.getElementById('adminWelcome').textContent='Welcome, '+currentUser.name;
+  document.getElementById('sidebarName').textContent=currentUser.name;
+  document.getElementById('sidebarRole').textContent=currentUser.role==='superadmin'?'Super Admin':'Uploader ('+currentUser.dept+')';
+  const isSA=currentUser.role==='superadmin';
+  ['navUsers','navDepts','navSems','navYears'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display=isSA?'flex':'none';
+  });
+  const saMgmt=document.getElementById('saMgmtSection');
+  if(saMgmt) saMgmt.style.display=isSA?'block':'none';
+  showAdminPanel('dashboard',document.querySelector('[data-panel="dashboard"]'));
+}
+
+// ====================== ADMIN PANELS ======================
+function showAdminPanel(panel,el){
+  document.querySelectorAll('.admin-nav-item').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const c=document.getElementById('adminContentArea');
+  switch(panel){
+    case'dashboard':c.innerHTML=renderAdminDashboard();break;
+    case'upload':c.innerHTML=renderUploadForm();break;
+    case'resources':c.innerHTML=renderManageResources();break;
+    case'events':c.innerHTML=renderManageEvents();break;
+    case'queries':c.innerHTML=renderAdminQueries();break;
+    case'depts':c.innerHTML=renderManageList('depts','Departments','ic-dept');break;
+    case'sems':c.innerHTML=renderManageList('sems','Semesters','ic-sem');break;
+    case'years':c.innerHTML=renderManageList('years','Years','ic-graduate');break;
+    case'users':c.innerHTML=currentUser.role==='superadmin'?renderManageUsers():'<p style="padding:2rem;color:var(--red)">Access denied. Super Admin only.</p>';break;
+  }
+}
+
+function renderAdminDashboard(){
+  const res=getData('resources',[]);
+  const evs=getData('events',[]);
+  const qs=getData('queries',[]);
+  const us=getData('users',[]);
+  const depts=getData('depts',[]);
+  const sems=getData('sems',[]);
+  const openQ=qs.filter(q=>q.status==='open').length;
+  // For assigned users, filter resources by dept
+  const myRes = currentUser.role==='superadmin' ? res : res.filter(r=>r.dept===currentUser.dept);
+  return `
+  <div class="admin-page-title">Dashboard</div>
+  <div class="admin-page-sub">Overview of FindInTint portal — ${currentUser.role==='superadmin'?'Super Admin view':'Uploader view for '+currentUser.dept}</div>
+  <div class="admin-cards-row">
+    <div class="admin-stat-card"><div class="admin-stat-num">${myRes.length}</div><div class="admin-stat-label">${currentUser.role==='superadmin'?'Total Resources':'My Dept Resources'}</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-num">${evs.length}</div><div class="admin-stat-label">Events & Calendar</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-num">${qs.length}</div><div class="admin-stat-label">Student Queries</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-num">${depts.length}</div><div class="admin-stat-label">Departments</div></div>
+    ${currentUser.role==='superadmin'?`<div class="admin-stat-card"><div class="admin-stat-num">${us.length}</div><div class="admin-stat-label">Admin Users</div></div>`:''}
+    ${openQ>0?`<div class="admin-stat-card" style="border-color:#E65100"><div class="admin-stat-num" style="color:#E65100">${openQ}</div><div class="admin-stat-label">Open Queries</div></div>`:''}
+  </div>
+  <div class="admin-page-title" style="font-size:1.1rem;margin-bottom:1rem">Recent Uploads</div>
+  <table class="admin-table">
+    <thead><tr><th>Title</th><th>Type</th><th>Department</th><th>Semester</th><th>Date</th><th>Uploaded By</th></tr></thead>
+    <tbody>${myRes.slice(-8).reverse().map(r=>`<tr>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.title}</td>
+      <td>${r.type}</td><td>${r.dept}</td><td>${r.sem||'-'}</td><td>${r.date||'-'}</td>
+      <td style="font-size:12px;color:var(--gray-400)">${r.uploadedBy||'Admin'}</td>
+    </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:2rem">No resources yet. Upload some!</td></tr>'}</tbody>
+  </table>
+  ${openQ>0?`<div class="alert alert-info" style="margin-top:1rem;padding:12px 16px;background:#FFF3E0;border-radius:8px;border-left:4px solid #E65100;color:#E65100;font-size:13px;display:flex;align-items:center;gap:8px">
+    <svg width="15" height="15"><use href="#ic-warning"/></svg> You have ${openQ} open student quer${openQ===1?'y':'ies'} awaiting response.
+    <button onclick="showAdminPanel('queries',document.querySelector('[data-panel=\\'queries\\']'))" style="margin-left:auto;padding:4px 12px;background:#E65100;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer">View Queries</button>
+  </div>`:''}
+  <div style="margin-top:2rem;padding:1rem;background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-100);font-size:13px;color:var(--gray-600)">
+    <strong>🔴 Database:</strong> Connected to MongoDB (findintint cluster) &nbsp;|&nbsp;
+    <button onclick="syncFromMongo().then(()=>showAdminPanel('dashboard',document.querySelector('[data-panel=\\'dashboard\\']')))" style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:3px 12px;font-size:12px;cursor:pointer">↻ Sync Now</button>
+  </div>
+  `;
+}
+
+function renderUploadForm(){
+  const depts=getData('depts',[]);
+  const sems=getData('sems',[]);
+  const years=getData('years',[]);
+  const cats=getData('categories',[]);
+  // For assigned users, pre-select their department
+  const deptOptions = currentUser.role==='superadmin'
+    ? `<option value="">-- Select --</option>${depts.map(d=>`<option>${d}</option>`).join('')}`
+    : `<option value="${currentUser.dept}" selected>${currentUser.dept}</option>`;
+  return `
+  <div class="admin-page-title">Upload Resource</div>
+  <div class="admin-page-sub">Add new study material for students — files are stored in MongoDB</div>
+  <div style="max-width:620px">
+  <div class="form-group"><label class="form-label">Resource Title *</label><input class="form-input" id="upTitle" placeholder="e.g. Data Structures Notes - Unit 3"></div>
+  <div class="form-group"><label class="form-label">Resource Type *</label>
+    <select class="form-select" id="upType">${cats.map(c=>`<option>${c}</option>`).join('')}</select>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="form-group"><label class="form-label">Department *</label>
+      <select class="form-select" id="upDept" ${currentUser.role!=='superadmin'?'disabled':''}>
+        ${deptOptions}
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Year *</label>
+      <select class="form-select" id="upYear"><option value="">-- Select --</option>${years.map(y=>`<option>${y}</option>`).join('')}</select>
+    </div>
+  </div>
+  <div class="form-group"><label class="form-label">Semester *</label>
+    <select class="form-select" id="upSem"><option value="">-- Select --</option>${sems.map(s=>`<option>${s}</option>`).join('')}</select>
+  </div>
+  <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="upDesc" placeholder="Brief description of this resource..."></textarea></div>
+  <div class="form-group">
+    <label class="form-label">Upload File (PDF / DOC / PPT) *</label>
+    <input type="file" class="form-file" id="upFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip">
+    <div style="font-size:11px;color:var(--gray-400);margin-top:6px">✅ Accepted: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, TXT, ZIP &nbsp;|&nbsp; Max 16MB (Base64 stored in MongoDB)</div>
+  </div>
+  <div id="uploadProgress" style="display:none;margin-bottom:1rem">
+    <div style="background:var(--gray-100);border-radius:6px;height:8px;overflow:hidden">
+      <div id="uploadBar" style="background:var(--red);height:100%;width:0%;transition:width 0.3s"></div>
+    </div>
+    <div id="uploadStatus" style="font-size:12px;color:var(--gray-600);margin-top:6px">Preparing upload...</div>
+  </div>
+  <button class="btn-primary" id="uploadBtn" onclick="doUpload()">
+    <svg width="16" height="16"><use href="#ic-upload"/></svg> Upload Resource to MongoDB
+  </button>
+  </div>
+  `;
+}
+
+async function doUpload(){
+  const title=document.getElementById('upTitle').value.trim();
+  const type=document.getElementById('upType').value;
+  const dept=document.getElementById('upDept').value;
+  const year=document.getElementById('upYear').value;
+  const sem=document.getElementById('upSem').value;
+  const desc=document.getElementById('upDesc').value.trim();
+  const fileInput=document.getElementById('upFile');
+  if(!title||!dept||!year||!sem){showToast('Please fill all required fields','error');return;}
+  if(!fileInput.files.length){showToast('Please select a file to upload','error');return;}
+  const file=fileInput.files[0];
+  // FIX: base64 encoding adds ~33% size. 10MB file → ~13.3MB base64 + metadata stays under MongoDB's 16MB doc limit
+  const maxSize=10*1024*1024;
+  if(file.size>maxSize){showToast('File too large. Max 10MB (MongoDB document limit).','error');return;}
+
+  const btn=document.getElementById('uploadBtn');
+  btn.disabled=true;btn.textContent='Uploading...';
+  document.getElementById('uploadProgress').style.display='block';
+  document.getElementById('uploadBar').style.width='20%';
+  document.getElementById('uploadStatus').textContent='Reading file...';
+
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    document.getElementById('uploadBar').style.width='50%';
+    document.getElementById('uploadStatus').textContent='Uploading to MongoDB...';
+    const newRes={
+      id:'r'+Date.now(),
+      title,type,dept,sem,year,desc,
+      date:new Date().toISOString().split('T')[0],
+      file:e.target.result, // base64
+      fileName:file.name,
+      fileSize:file.size,
+      fileType:file.type,
+      uploadedBy:currentUser.name,
+      uploadedById:currentUser.id,
+      createdAt:new Date().toISOString()
+    };
+    // Save to MongoDB
+    const result = await mongoInsertOne('resources', newRes);
+    document.getElementById('uploadBar').style.width='90%';
+    document.getElementById('uploadStatus').textContent='Saving...';
+
+    if(result && result.insertedId){
+      newRes._id = result.insertedId;
+    }
+    // Also save locally
+    const res=getData('resources',[]);
+    res.push(newRes);
+    setData('resources',res);
+    document.getElementById('uploadBar').style.width='100%';
+    document.getElementById('uploadStatus').textContent='✅ Uploaded successfully!';
+    updateHeroStats();
+    setTimeout(()=>{
+      showToast('Resource uploaded to MongoDB successfully!','success');
+      document.getElementById('upTitle').value='';
+      document.getElementById('upDesc').value='';
+      document.getElementById('upFile').value='';
+      document.getElementById('upDept').value='';
+      document.getElementById('upYear').value='';
+      document.getElementById('upSem').value='';
+      document.getElementById('uploadProgress').style.display='none';
+      btn.disabled=false;
+      btn.innerHTML='<svg width="16" height="16"><use href="#ic-upload"/></svg> Upload Resource to MongoDB';
+    },1500);
+  };
+  reader.onerror=function(){
+    showToast('Error reading file','error');
+    btn.disabled=false;btn.innerHTML='<svg width="16" height="16"><use href="#ic-upload"/></svg> Upload Resource to MongoDB';
+    document.getElementById('uploadProgress').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderManageResources(){
+  const allRes=getData('resources',[]);
+  const res = currentUser.role==='superadmin' ? allRes : allRes.filter(r=>r.dept===currentUser.dept);
+  const depts=getData('depts',[]);
+  const sems=getData('sems',[]);
+  return `
+  <div class="admin-page-title">Manage Resources</div>
+  <div class="admin-page-sub">View, download and delete uploaded resources${currentUser.role!=='superadmin'?' (your department only)':''}</div>
+  <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.5rem">
+    ${currentUser.role==='superadmin'?`<select class="filter-select" id="mrDept" onchange="filterAdminRes()"><option value="">All Departments</option>${depts.map(d=>`<option>${d}</option>`).join('')}</select>`:''}
+    <select class="filter-select" id="mrSem" onchange="filterAdminRes()"><option value="">All Semesters</option>${sems.map(s=>`<option>${s}</option>`).join('')}</select>
+    <select class="filter-select" id="mrType" onchange="filterAdminRes()"><option value="">All Types</option>${getData('categories',[]).map(c=>`<option>${c}</option>`).join('')}</select>
+    <button class="btn-table btn-table-add" onclick="syncFromMongo().then(()=>showAdminPanel('resources',document.querySelector('[data-panel=\\'resources\\']')))">↻ Refresh</button>
+  </div>
+  <div id="adminResList">${buildAdminResTable(res)}</div>
+  `;
+}
+
+function buildAdminResTable(res){
+  if(!res.length)return `<div class="empty-state"><div class="empty-state-icon"><svg><use href="#ic-inbox"/></svg></div><h3>No resources found</h3><p>Upload resources using the Upload section.</p></div>`;
+  return `<table class="admin-table">
+  <thead><tr><th>Title</th><th>Type</th><th>Dept</th><th>Sem</th><th>Year</th><th>Date</th><th>File</th><th>By</th><th>Actions</th></tr></thead>
+  <tbody>${res.map(r=>`<tr>
+    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.title}">${r.title}</td>
+    <td>${r.type}</td><td>${r.dept}</td><td>${r.sem||'-'}</td><td>${r.year||'-'}</td><td>${r.date||'-'}</td>
+    <td style="font-size:11px;color:var(--gray-400)">${r.fileName||'N/A'}</td>
+    <td style="font-size:11px;color:var(--gray-400)">${r.uploadedBy||'Admin'}</td>
+    <td style="display:flex;gap:4px;flex-wrap:wrap">
+      ${r.file?`<button class="btn-table btn-table-edit" onclick="downloadResource('${r.id}')">↓</button>`:''}
+      ${(currentUser.role==='superadmin'||r.uploadedById===currentUser.id)?`<button class="btn-table btn-table-danger" onclick="deleteResource('${r.id}')">Del</button>`:''}
+    </td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+function filterAdminRes(){
+  const dept=document.getElementById('mrDept')?.value||'';
+  const sem=document.getElementById('mrSem')?.value||'';
+  const type=document.getElementById('mrType')?.value||'';
+  let res=getData('resources',[]);
+  if(currentUser.role!=='superadmin') res=res.filter(r=>r.dept===currentUser.dept);
+  if(dept)res=res.filter(r=>r.dept===dept);
+  if(sem)res=res.filter(r=>r.sem===sem);
+  if(type)res=res.filter(r=>r.type===type);
+  document.getElementById('adminResList').innerHTML=buildAdminResTable(res);
+}
+
+function downloadResource(id){
+  const res=getData('resources',[]).find(r=>r.id===id);
+  if(!res||!res.file){showToast('File not available','error');return;}
+  const a=document.createElement('a');
+  a.href=res.file;
+  a.download=res.fileName||'resource';
+  a.click();
+}
+
+async function deleteResource(id){
+  if(!confirm('Delete this resource? This cannot be undone.'))return;
+  // FIX: filter by the string id field we set, not MongoDB's _id
+  await mongoDeleteOne('resources',{id:String(id)});
+  setData('resources',getData('resources',[]).filter(r=>String(r.id)!==String(id)));
+  updateHeroStats();
+  showAdminPanel('resources',document.querySelector('[data-panel="resources"]'));
+  showToast('Resource deleted','success');
+}
+
+function renderManageEvents(){
+  const evs=getData('events',[]);
+  return `
+  <div class="admin-page-title">Events & Calendar</div>
+  <div class="admin-page-sub">Manage upcoming events, holidays and academic calendar</div>
+  <div style="max-width:600px;margin-bottom:2rem">
+    <div style="background:var(--white);border-radius:var(--radius);padding:1.5rem;border:1px solid var(--gray-100)">
+    <div style="font-size:16px;font-weight:700;margin-bottom:1rem">Add New Event / Calendar Item</div>
+    <div class="form-group"><label class="form-label">Title *</label><input class="form-input" id="evTitle" placeholder="Event title"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="form-group"><label class="form-label">Date *</label><input type="date" class="form-input" id="evDate"></div>
+      <div class="form-group"><label class="form-label">Time</label><input class="form-input" id="evTime" placeholder="e.g. 10:00 AM"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Type</label>
+      <select class="form-select" id="evType"><option>Upcoming Event</option><option>Holiday List</option><option>Academic Calendar</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Venue / Description</label><textarea class="form-textarea" id="evDesc" placeholder="Location or description..."></textarea></div>
+    <button class="btn-primary" onclick="addEvent()">
+      <svg width="16" height="16"><use href="#ic-new"/></svg> Add Event
+    </button>
+    </div>
+  </div>
+  <table class="admin-table">
+    <thead><tr><th>Title</th><th>Date</th><th>Type</th><th>Actions</th></tr></thead>
+    <tbody id="evTableBody">${evs.map(e=>`<tr><td>${e.title}</td><td>${e.date}</td><td>${e.type}</td><td><button class="btn-table btn-table-danger" onclick="deleteEvent('${e.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--gray-400)">No events</td></tr>'}</tbody>
+  </table>
+  `;
+}
+
+async function addEvent(){
+  const title=document.getElementById('evTitle').value.trim();
+  const date=document.getElementById('evDate').value;
+  const time=document.getElementById('evTime').value;
+  const type=document.getElementById('evType').value;
+  const desc=document.getElementById('evDesc').value;
+  if(!title||!date){showToast('Title and date are required','error');return;}
+  const ev={id:'ev'+Date.now(),title,date,time,type,desc,venue:desc,createdAt:new Date().toISOString()};
+  const evs=getData('events',[]);
+  evs.push(ev);
+  setData('events',evs);
+  await mongoInsertOne('events',ev);
+  showToast('Event added!','success');
+  showAdminPanel('events',document.querySelector('[data-panel="events"]'));
+}
+
+async function deleteEvent(id){
+  if(!confirm('Delete this event?'))return;
+  await mongoDeleteOne('events',{id:String(id)});
+  setData('events',getData('events',[]).filter(e=>String(e.id)!==String(id)));
+  showAdminPanel('events',document.querySelector('[data-panel="events"]'));
+  showToast('Event deleted','success');
+}
+
+function renderAdminQueries(){
+  const qs=getData('queries',[]);
+  if(!qs.length)return`<div class="admin-page-title">Student Queries</div><div class="empty-state"><div class="empty-state-icon"><svg><use href="#ic-queries"/></svg></div><h3>No queries yet</h3></div>`;
+  return `<div class="admin-page-title">Student Queries</div><div class="admin-page-sub">View and respond to student queries</div>
+  ${qs.map(q=>`
+  <div class="chat-thread">
+    <div class="chat-thread-header">
+      <div>
+        <div style="font-weight:700;font-size:15px">${q.subject}</div>
+        <div class="chat-thread-meta" style="margin-top:4px">
+          <span class="card-tag">${q.dept}</span>
+          <span style="font-size:12px;color:var(--gray-400)">${q.name} · ${q.date}</span>
+        </div>
+      </div>
+      <span class="status-badge status-${q.status}">${q.status}</span>
+    </div>
+    <div class="chat-msg chat-msg-user">
+      <div class="chat-msg-author user-author"><svg width="13" height="13"><use href="#ic-user"/></svg> ${q.name}</div>
+      <div class="chat-msg-text">${q.message}</div>
+      <div class="chat-msg-time">${q.date}</div>
+    </div>
+    ${(q.replies||[]).map(r=>`
+    <div class="chat-msg chat-msg-admin">
+      <div class="chat-msg-author admin-author"><svg width="13" height="13"><use href="#ic-user"/></svg> ${r.author}</div>
+      <div class="chat-msg-text">${r.text}</div>
+      <div class="chat-msg-time">${r.date}</div>
+    </div>`).join('')}
+    ${q.status!=='closed'?`
+    <div style="padding:1rem 1.25rem;border-top:1px solid var(--gray-100)">
+      <textarea class="form-textarea" id="rep_${q.id}" placeholder="Write reply..." style="min-height:70px;margin-bottom:0.75rem"></textarea>
+      <div style="display:flex;gap:0.75rem">
+        <button class="btn-table btn-table-add" onclick="replyQuery('${q.id}')">
+          <svg width="14" height="14"><use href="#ic-send"/></svg> Send Reply
+        </button>
+        <button class="btn-table btn-table-edit" onclick="closeQueryItem('${q.id}')">Mark Closed</button>
+      </div>
+    </div>`:''}
+  </div>`).join('')}`;
+}
+
+async function replyQuery(id){
+  const text=document.getElementById('rep_'+id).value.trim();
+  if(!text){showToast('Write a reply first','error');return;}
+  const qs=getData('queries',[]);
+  const q=qs.find(q=>q.id===id);
+  if(q){
+    q.replies=q.replies||[];
+    const reply={author:currentUser.name,text,date:new Date().toLocaleDateString()};
+    q.replies.push(reply);
+    q.status='answered';
+  }
+  setData('queries',qs);
+  await mongoUpdateOne('queries',{id:String(id)},{$set:{replies:q.replies,status:'answered'}});
+  showAdminPanel('queries',document.querySelector('[data-panel="queries"]'));
+  showToast('Reply sent!','success');
+}
+
+async function closeQueryItem(id){
+  const qs=getData('queries',[]);
+  const q=qs.find(q=>String(q.id)===String(id));
+  if(q)q.status='closed';
+  setData('queries',qs);
+  await mongoUpdateOne('queries',{id:String(id)},{$set:{status:'closed'}});
+  showAdminPanel('queries',document.querySelector('[data-panel="queries"]'));
+  showToast('Query marked as closed','success');
+}
+
+function renderManageList(key,title,icon){
+  const items=getData(key,[]);
+  return `
+  <div class="admin-page-title">${title}</div>
+  <div class="admin-page-sub">Add or remove ${title.toLowerCase()} visible in the portal</div>
+  <div style="max-width:500px">
+    <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem">
+      <input class="form-input" id="newItem_${key}" placeholder="Add new ${title.slice(0,-1).toLowerCase()}..." style="flex:1">
+      <button class="btn-table btn-table-add" onclick="addListItem('${key}')">
+        <svg width="14" height="14"><use href="#ic-new"/></svg> Add
+      </button>
+    </div>
+    <table class="admin-table">
+      <thead><tr><th>#</th><th>${title.slice(0,-1)}</th><th>Action</th></tr></thead>
+      <tbody id="listBody_${key}">${renderListRows(key,items)}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderListRows(key,items){
+  return items.map((item,i)=>`<tr><td>${i+1}</td><td>${item}</td><td><button class="btn-table btn-table-danger" onclick="deleteListItem('${key}','${item.replace(/'/g,"\\'")}')">Remove</button></td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--gray-400)">None added</td></tr>';
+}
+
+async function addListItem(key){
+  const inp=document.getElementById('newItem_'+key);
+  const val=inp.value.trim();
+  if(!val){showToast('Enter a value','error');return;}
+  const items=getData(key,[]);
+  if(items.includes(val)){showToast('Already exists','error');return;}
+  items.push(val);
+  setData(key,items);
+  // Sync setting to MongoDB
+  await mongoUpdateOne('settings',{key:key},{$set:{key:key,value:items}},{upsert:true}).catch(()=>mongoInsertOne('settings',{key,value:items}));
+  document.getElementById('listBody_'+key).innerHTML=renderListRows(key,items);
+  inp.value='';
+  showToast('Added successfully','success');
+}
+
+async function deleteListItem(key,val){
+  if(!confirm('Remove "'+val+'"?'))return;
+  const items=getData(key,[]).filter(i=>i!==val);
+  setData(key,items);
+  await mongoUpdateOne('settings',{key:key},{$set:{key:key,value:items}}).catch(()=>{});
+  document.getElementById('listBody_'+key).innerHTML=renderListRows(key,items);
+  showToast('Removed','success');
+}
+
+function renderManageUsers(){
+  const users=getData('users',[]);
+  const depts=getData('depts',[]);
+  return `
+  <div class="admin-page-title">Manage Users</div>
+  <div class="admin-page-sub">Create and manage admin / uploader accounts (Super Admin only)</div>
+  <div style="max-width:600px;background:var(--white);border-radius:var(--radius);padding:1.5rem;border:1px solid var(--gray-100);margin-bottom:2rem">
+    <div style="font-size:16px;font-weight:700;margin-bottom:1rem">Create New User</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="nuName" placeholder="Full name"></div>
+      <div class="form-group"><label class="form-label">User ID *</label><input class="form-input" id="nuId" placeholder="Unique login ID"></div>
+      <div class="form-group"><label class="form-label">Password *</label><input class="form-input" id="nuPwd" type="password" placeholder="Set password"></div>
+      <div class="form-group"><label class="form-label">Role</label>
+        <select class="form-select" id="nuRole" onchange="toggleDeptSelect(this.value)">
+          <option value="uploader">Uploader (Assigned Dept)</option>
+          <option value="superadmin">Super Admin (All Access)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" id="deptSelectGroup">
+      <label class="form-label">Assigned Department <span style="color:var(--red)">*</span> <small style="color:var(--gray-400)">(Uploader can only upload to this dept)</small></label>
+      <select class="form-select" id="nuDept"><option value="">-- Select Department --</option>${depts.map(d=>`<option>${d}</option>`).join('')}</select>
+    </div>
+    <button class="btn-primary" onclick="createUser()">
+      <svg width="16" height="16"><use href="#ic-new"/></svg> Create User Account
+    </button>
+  </div>
+  <table class="admin-table">
+    <thead><tr><th>Name</th><th>User ID</th><th>Role</th><th>Department</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="userTableBody">${renderUserRows(users)}</tbody>
+  </table>`;
+}
+
+function toggleDeptSelect(role){
+  const grp=document.getElementById('deptSelectGroup');
+  if(grp) grp.style.display=role==='superadmin'?'none':'block';
+}
+
+function renderUserRows(users){
+  return users.map(u=>`<tr>
+    <td>${u.name}</td>
+    <td><code style="background:var(--gray-50);padding:2px 6px;border-radius:4px;font-size:12px">${u.userId}</code></td>
+    <td><span class="status-badge ${u.role==='superadmin'?'status-answered':'status-open'}">${u.role==='superadmin'?'Super Admin':'Uploader'}</span></td>
+    <td>${u.dept||'All'}</td>
+    <td><span class="status-badge ${u.active?'status-answered':'status-closed'}">${u.active?'Active':'Inactive'}</span></td>
+    <td>
+      ${u.userId!=='superadmin'?`
+        <button class="btn-table btn-table-edit" onclick="toggleUser('${u.id}')">${u.active?'Deactivate':'Activate'}</button>
+        <button class="btn-table btn-table-danger" onclick="deleteUser('${u.id}')">Delete</button>
+      `:'<span style="font-size:12px;color:var(--gray-400)">Protected</span>'}
+    </td>
+  </tr>`).join('');
+}
+
+async function createUser(){
+  const name=document.getElementById('nuName').value.trim();
+  const userId=document.getElementById('nuId').value.trim();
+  const password=document.getElementById('nuPwd').value.trim();
+  const role=document.getElementById('nuRole').value;
+  const dept=role==='superadmin'?'All':document.getElementById('nuDept').value;
+  if(!name||!userId||!password){showToast('All fields required','error');return;}
+  if(role==='uploader'&&!dept){showToast('Please assign a department for Uploader','error');return;}
+  const users=getData('users',[]);
+  if(users.find(u=>u.userId===userId)){showToast('User ID already exists','error');return;}
+  const newUser={id:'u'+Date.now(),name,userId,password,role,dept,active:true,createdAt:new Date().toISOString(),createdBy:currentUser.name};
+  users.push(newUser);
+  setData('users',users);
+  await mongoInsertOne('users',newUser);
+  document.getElementById('userTableBody').innerHTML=renderUserRows(getData('users',[]));
+  document.getElementById('nuName').value='';document.getElementById('nuId').value='';document.getElementById('nuPwd').value='';
+  showToast(`User created! ID: ${userId} | Role: ${role} | Dept: ${dept}`,'success');
+}
+
+async function toggleUser(id){
+  const users=getData('users',[]);
+  const u=users.find(u=>String(u.id)===String(id));
+  if(u)u.active=!u.active;
+  setData('users',users);
+  await mongoUpdateOne('users',{id:String(id)},{$set:{active:u.active}});
+  document.getElementById('userTableBody').innerHTML=renderUserRows(getData('users',[]));
+  showToast('User status updated','success');
+}
+
+async function deleteUser(id){
+  if(!confirm('Delete this user?'))return;
+  setData('users',getData('users',[]).filter(u=>String(u.id)!==String(id)));
+  await mongoDeleteOne('users',{id:String(id)});
+  document.getElementById('userTableBody').innerHTML=renderUserRows(getData('users',[]));
+  showToast('User deleted','success');
+}
+
+// ====================== PUBLIC SITE ======================
+let currentPublicTab='home';
+let activeFilters={dept:'',sem:'',year:''};
+
+function showLogoTransition(callback){
+  const curtain=document.getElementById('transition-curtain');
+  curtain.style.transform='translateY(0)';
+  setTimeout(()=>{
+    if(callback)callback();
+    setTimeout(()=>{curtain.style.transform='translateY(100%)';},600);
+  },400);
+}
+
+function switchPublicTab(tab,el){
+  searchActive=false;
+  document.getElementById('heroSearch').value='';
+  document.getElementById('searchClearBtn').style.display='none';
+  hideSuggestions();
+  if(tab!=='home'){
+    document.getElementById('heroSection').style.display='none';
+  }else{
+    document.getElementById('heroSection').style.display='block';
+  }
+  currentPublicTab=tab;
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  showLogoTransition(()=>renderPublicContent());
+}
+
+function renderPublicContent(){
+  const c=document.getElementById('publicContent');
+  switch(currentPublicTab){
+    case'home':c.innerHTML=renderHome();break;
+    case'syllabus':c.innerHTML=renderCategory(['Syllabus']);break;
+    case'books':c.innerHTML=renderCategory(['Book PDF']);break;
+    case'questions':c.innerHTML=renderCategory(['CA2 Question','Semester Question','Previous Question']);break;
+    case'assignments':c.innerHTML=renderCategory(['Assignment']);break;
+    case'notes':c.innerHTML=renderCategory(['Notes']);break;
+    case'lab':c.innerHTML=renderCategory(['Lab Manual']);break;
+    case'calendar':c.innerHTML=renderEventsSection('Academic Calendar');break;
+    case'events':c.innerHTML=renderEventsSection('events');break;
+    case'queries':c.innerHTML=renderPublicQueries();break;
+    default:c.innerHTML=renderHome();
+  }
+}
+
+function renderHome(){
+  const res=getData('resources',[]);
+  const recent=res.slice(-8).reverse();
+  const cats=getData('categories',[]);
+  const catCounts={};
+  res.forEach(r=>{catCounts[r.type]=(catCounts[r.type]||0)+1;});
+  return `
+  <div class="section-header"><div class="section-title">
+    <div class="icon"><svg><use href="#ic-home"/></svg></div> Browse by Category
+  </div></div>
+  <div class="cat-grid">
+    ${[{name:'Syllabus',icon:'ic-syllabus',tab:'syllabus'},{name:'Book PDF',icon:'ic-book',tab:'books'},{name:'Notes',icon:'ic-notes',tab:'notes'},{name:'Previous Question',icon:'ic-question',tab:'questions'},{name:'Assignment',icon:'ic-assignment',tab:'assignments'},{name:'Lab Manual',icon:'ic-lab',tab:'lab'},{name:'Academic Calendar',icon:'ic-calendar',tab:'calendar'},{name:'Upcoming Event',icon:'ic-events',tab:'events'}].map(cat=>`
+    <div class="cat-card" onclick="switchPublicTab('${cat.tab}',null);document.querySelectorAll('.nav-tab').forEach((b,i)=>{b.classList.remove('active');})">
+      <div class="cat-icon-wrap"><svg><use href="#${cat.icon}"/></svg></div>
+      <div class="cat-name">${cat.name}</div>
+      <div class="cat-count">${catCounts[cat.name]||0} files</div>
+    </div>`).join('')}
+  </div>
+  ${res.length?`
+  <div class="section-header">
+    <div class="section-title"><div class="icon"><svg><use href="#ic-time"/></svg></div> Recently Added <span class="section-count">${recent.length}</span></div>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <select class="filter-select" id="fDept" onchange="applyFilters()"><option value="">All Depts</option>${getData('depts',[]).map(d=>`<option>${d}</option>`).join('')}</select>
+    <select class="filter-select" id="fSem" onchange="applyFilters()"><option value="">All Sems</option>${getData('sems',[]).map(s=>`<option>${s}</option>`).join('')}</select>
+    <select class="filter-select" id="fYear" onchange="applyFilters()"><option value="">All Years</option>${getData('years',[]).map(y=>`<option>${y}</option>`).join('')}</select>
+    <button class="btn-filter-clear" onclick="clearFilters()"><svg width="13" height="13"><use href="#ic-x"/></svg> Clear</button>
+  </div>
+  <div id="homeResList"><div class="cards-grid">${recent.map(r=>renderResourceCard(r)).join('')}</div></div>
+  `:`<div class="empty-state"><div class="empty-state-icon"><svg><use href="#ic-inbox"/></svg></div><h3>No resources yet</h3><p>Admin will upload study materials soon. Check back later!</p></div>`}`;
+}
+
+function applyFilters(){
+  const dept=document.getElementById('fDept')?.value||'';
+  const sem=document.getElementById('fSem')?.value||'';
+  const year=document.getElementById('fYear')?.value||'';
+  let res=getData('resources',[]).slice(-50).reverse();
+  if(dept)res=res.filter(r=>r.dept===dept);
+  if(sem)res=res.filter(r=>r.sem===sem);
+  if(year)res=res.filter(r=>r.year===year);
+  const el=document.getElementById('homeResList');
+  if(el)el.innerHTML=res.length?`<div class="cards-grid">${res.map(r=>renderResourceCard(r)).join('')}</div>`:`<div class="empty-state"><div class="empty-state-icon"><svg><use href="#ic-inbox"/></svg></div><h3>No resources match filters</h3><p>Try different filters.</p></div>`;
+}
+function clearFilters(){
+  ['fDept','fSem','fYear'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  applyFilters();
+}
+
+function renderCategory(types){
+  const all=getData('resources',[]);
+  const res=all.filter(r=>types.includes(r.type));
+  const depts=getData('depts',[]);
+  const sems=getData('sems',[]);
+  return `
+  <div class="section-header"><div class="section-title">
+    <div class="icon"><svg><use href="#ic-folder"/></svg></div> ${types.join(' / ')} <span class="section-count">${res.length}</span>
+  </div></div>
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <select class="filter-select" id="catDept" onchange="applyCatFilters(${JSON.stringify(types)})"><option value="">All Depts</option>${depts.map(d=>`<option>${d}</option>`).join('')}</select>
+    <select class="filter-select" id="catSem" onchange="applyCatFilters(${JSON.stringify(types)})"><option value="">All Sems</option>${sems.map(s=>`<option>${s}</option>`).join('')}</select>
+    <select class="filter-select" id="catYear" onchange="applyCatFilters(${JSON.stringify(types)})"><option value="">All Years</option>${getData('years',[]).map(y=>`<option>${y}</option>`).join('')}</select>
+    <button class="btn-filter-clear" onclick="document.getElementById('catDept').value='';document.getElementById('catSem').value='';document.getElementById('catYear').value='';applyCatFilters(${JSON.stringify(types)})"><svg width="13" height="13"><use href="#ic-x"/></svg> Clear</button>
+  </div>
+  <div id="catList">${renderCatList(res)}</div>`;
+}
+
+function applyCatFilters(types){
+  const dept=document.getElementById('catDept')?.value||'';
+  const sem=document.getElementById('catSem')?.value||'';
+  const year=document.getElementById('catYear')?.value||'';
+  let res=getData('resources',[]).filter(r=>types.includes(r.type));
+  if(dept)res=res.filter(r=>r.dept===dept);
+  if(sem)res=res.filter(r=>r.sem===sem);
+  if(year)res=res.filter(r=>r.year===year);
+  const el=document.getElementById('catList');
+  if(el)el.innerHTML=renderCatList(res);
+}
+
+function renderCatList(res){
+  return res.length?`<div class="cards-grid">${res.map(r=>renderResourceCard(r)).join('')}</div>`:`<div class="empty-state"><div class="empty-state-icon"><svg><use href="#ic-inbox"/></svg></div><h3>Nothing here yet</h3><p>No resources in this category. Admin will upload soon!</p></div>`;
+}
+
+function renderResourceCard(r){
+  const typeClass={
+    'Syllabus':'badge-syllabus','Book PDF':'badge-book','CA2 Question':'badge-question','Semester Question':'badge-question',
+    'Assignment':'badge-assignment','Notes':'badge-notes','Lab Manual':'badge-lab','Previous Question':'badge-question',
+    'Academic Calendar':'badge-calendar','Holiday List':'badge-holiday','Upcoming Event':'badge-event'
+  }[r.type]||'badge-other';
+  return `<div class="resource-card">
+    <div class="card-type-badge ${typeClass}">${r.type}</div>
+    <div class="card-title">${r.title}</div>
+    <div class="card-meta">
+      ${r.dept?`<span class="card-tag">${r.dept}</span>`:''}
+      ${r.sem?`<span class="card-tag">${r.sem}</span>`:''}
+      ${r.year?`<span class="card-tag">${r.year}</span>`:''}
+    </div>
+    ${r.desc?`<div class="card-desc">${r.desc}</div>`:''}
+    <div class="card-date"><svg><use href="#ic-time"/></svg>${r.date||'N/A'} ${r.uploadedBy?'· by '+r.uploadedBy:''}</div>
+    ${r.file
+      ?`<button class="btn-download" onclick="downloadPublicResource('${r.id}')"><svg width="14" height="14"><use href="#ic-download"/></svg> Download ${r.fileName?'('+r.fileName+')':''}</button>`
+      :`<button class="btn-download btn-download-outline" disabled style="opacity:0.5;cursor:not-allowed">File not available</button>`
+    }
+  </div>`;
+}
+
+function downloadPublicResource(id){
+  const res=getData('resources',[]).find(r=>r.id===id);
+  if(!res||!res.file){showToast('File not available yet','error');return;}
+  const a=document.createElement('a');
+  a.href=res.file;
+  a.download=res.fileName||'resource';
+  a.click();
+  showToast('Downloading '+res.fileName,'success');
+}
+
+function renderEventsSection(filter){
+  const evs=getData('events',[]);
+  const filtered=filter==='events'?evs.filter(e=>e.type!=='Academic Calendar'):evs.filter(e=>e.type===filter);
+  return `<div class="section-header"><div class="section-title"><div class="icon"><svg><use href="#ic-calendar"/></svg></div> ${filter==='events'?'Events & Holidays':'Academic Calendar'} <span class="section-count">${filtered.length}</span></div></div>
+  ${filtered.length
+    ?`<div style="display:flex;flex-direction:column;gap:1rem">${filtered.map(e=>{
+      const d=new Date(e.date);
+      return`<div class="event-card">
+        <div class="event-date-box"><div class="event-day">${d.getDate()||'?'}</div><div class="event-month">${d.toLocaleString('default',{month:'short'})||''}</div></div>
+        <div><div class="event-info-title">${e.title}</div>
+        <div class="event-info-meta"><svg><use href="#ic-time"/></svg>${e.time||'All Day'} ${e.venue?'· '+e.venue:''}</div>
+        ${e.desc?`<div style="font-size:13px;color:var(--gray-600);margin-top:6px">${e.desc}</div>`:''}
+        <span class="card-type-badge badge-event" style="margin-top:8px;display:inline-flex">${e.type}</span></div>
+      </div>`;}).join('')}</div>`
+    :`<div class="empty-state"><div class="empty-state-icon"><svg><use href="#ic-calendar"/></svg></div><h3>No events</h3><p>Check back soon!</p></div>`}`;
+}
+
+function renderPublicQueries(){
+  const qs=getData('queries',[]);
+  return `
+  <div class="section-header">
+    <div class="section-title"><div class="icon"><svg><use href="#ic-queries"/></svg></div> Student Queries <span class="section-count">${qs.length}</span></div>
+    <button class="btn-filter" onclick="openQueryModal()"><svg width="14" height="14"><use href="#ic-new"/></svg> Ask Query</button>
+  </div>
+  <div class="chat-container">
+  ${qs.length
+    ?qs.map(q=>`<div class="chat-thread">
+      <div class="chat-thread-header">
+        <div><div style="font-weight:700">${q.subject}</div>
+        <div class="chat-thread-meta" style="margin-top:4px"><span class="card-tag">${q.dept}</span><span style="font-size:12px;color:var(--gray-400)">${q.name} · ${q.date}</span></div></div>
+        <span class="status-badge status-${q.status}">${q.status}</span>
+      </div>
+      <div class="chat-msg chat-msg-user">
+        <div class="chat-msg-author user-author"><svg width="13" height="13"><use href="#ic-user"/></svg> ${q.name}</div>
+        <div class="chat-msg-text">${q.message}</div>
+        <div class="chat-msg-time">${q.date}</div>
+      </div>
+      ${(q.replies||[]).map(r=>`<div class="chat-msg chat-msg-admin">
+        <div class="chat-msg-author admin-author"><svg width="13" height="13"><use href="#ic-user"/></svg> ${r.author}</div>
+        <div class="chat-msg-text">${r.text}</div>
+        <div class="chat-msg-time">Answered: ${r.date}</div>
+      </div>`).join('')}
+    </div>`).join('')
+    :`<div class="empty-state"><div class="empty-state-icon"><svg><use href="#ic-queries"/></svg></div><h3>No queries yet</h3><p>Be the first to ask a question!</p></div>`}
+  </div>`;
+}
+
+// ====================== QUERY MODAL ======================
+function openQueryModal(){
+  const depts=getData('depts',[]);
+  const sel=document.getElementById('qDept');
+  sel.innerHTML=`<option value="">-- Select Department --</option>${depts.map(d=>`<option>${d}</option>`).join('')}`;
+  document.getElementById('queryModal').classList.add('open');
+}
+function closeQueryModal(){document.getElementById('queryModal').classList.remove('open');}
+
+async function submitQuery(){
+  const name=document.getElementById('qName').value.trim();
+  const dept=document.getElementById('qDept').value;
+  const subject=document.getElementById('qSubject').value.trim();
+  const message=document.getElementById('qMessage').value.trim();
+  if(!name||!dept||!subject||!message){showToast('Please fill all fields','error');return;}
+  const q={id:'q'+Date.now(),name,dept,subject,message,date:new Date().toLocaleDateString(),status:'open',replies:[],createdAt:new Date().toISOString()};
+  const qs=getData('queries',[]);
+  qs.push(q);
+  setData('queries',qs);
+  await mongoInsertOne('queries',q);
+  closeQueryModal();
+  document.getElementById('qName').value='';document.getElementById('qSubject').value='';document.getElementById('qMessage').value='';
+  showToast('Query submitted! Admin will reply soon.','success');
+  if(currentPublicTab==='queries')renderPublicContent();
+}
+
+// ====================== SEARCH (Fixed: no auto-search, Enter/button only) ======================
+let searchActive=false;
+let suggTimeout=null;
+
+// Only show suggestions on input, do NOT auto-search
+function liveSearch(val){
+  const clearBtn=document.getElementById('searchClearBtn');
+  if(clearBtn) clearBtn.style.display=val.trim()?'block':'none';
+  clearTimeout(suggTimeout);
+  if(!val.trim()){
+    hideSuggestions();
+    return;
+  }
+  // Show suggestions after 300ms of typing (but no actual search)
+  suggTimeout=setTimeout(()=>showSuggestions(val),300);
+}
+
+async function showSuggestions(q){
+  const suggestions=await getSearchSuggestions(q);
+  let box=document.getElementById('searchSuggestions');
+  if(!box){
+    box=document.createElement('div');
+    box.id='searchSuggestions';
+    box.style.cssText=`position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:0 0 12px 12px;box-shadow:0 8px 30px rgba(192,21,42,0.15);z-index:200;overflow:hidden;border:2px solid rgba(192,21,42,0.15);border-top:none`;
+    const heroSearch=document.querySelector('.hero-search');
+    if(heroSearch){heroSearch.style.position='relative';heroSearch.appendChild(box);}
+  }
+  if(!suggestions.length){box.style.display='none';return;}
+  box.style.display='block';
+  box.innerHTML=suggestions.map(s=>`
+    <div onclick="selectSuggestion('${s.text.replace(/'/g,"\\'")}',event)"
+      style="padding:10px 18px;cursor:pointer;font-size:13px;color:var(--gray-700);display:flex;align-items:center;gap:10px;transition:background 0.15s"
+      onmouseover="this.style.background='var(--red-soft)'" onmouseout="this.style.background='transparent'">
+      <svg width="14" height="14" style="stroke:var(--gray-400);flex-shrink:0"><use href="#ic-search"/></svg>
+      <span style="flex:1">${s.text}</span>
+      <span style="font-size:10px;background:var(--red-soft);color:var(--red);padding:2px 8px;border-radius:10px;font-weight:600">${s.badge}</span>
+    </div>`).join('')+`<div style="padding:8px 18px;font-size:11px;color:var(--gray-400);border-top:1px solid var(--gray-100);display:flex;align-items:center;gap:6px">
+      <svg width="12" height="12" style="stroke:var(--gray-400)"><use href="#ic-info"/></svg>
+      Press <kbd style="background:var(--gray-100);padding:1px 5px;border-radius:3px;font-size:10px">Enter</kbd> or click Search to search
+    </div>`;
+}
+
+function hideSuggestions(){
+  const box=document.getElementById('searchSuggestions');
+  if(box)box.style.display='none';
+}
+
+function selectSuggestion(text, e){
+  if(e)e.stopPropagation();
+  document.getElementById('heroSearch').value=text;
+  hideSuggestions();
+  doSearch(text);
+}
+
+// Search only triggered by Enter key or Search button
+function triggerSearch(){
+  const val=document.getElementById('heroSearch').value.trim();
+  hideSuggestions();
+  if(val)doSearch(val);
+}
+
+function doSearch(q){
+  if(!q)q=document.getElementById('heroSearch').value.trim();
+  if(!q)return;
+  q=q.toLowerCase();
+  searchActive=true;
+  hideSuggestions();
+  const res=getData('resources',[]).filter(r=>
+    (r.title||'').toLowerCase().includes(q)||
+    (r.desc||'').toLowerCase().includes(q)||
+    (r.dept||'').toLowerCase().includes(q)||
+    (r.type||'').toLowerCase().includes(q)||
+    (r.sem||'').toLowerCase().includes(q)||
+    (r.year||'').toLowerCase().includes(q)||
+    (r.fileName||'').toLowerCase().includes(q)
+  );
+  const c=document.getElementById('publicContent');
+  document.getElementById('heroSection').style.display='none';
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  c.innerHTML=`
+  <div class="search-result-bar" style="background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
+    <div style="font-size:14px;color:var(--gray-700)">
+      <svg width="14" height="14" style="vertical-align:-2px;margin-right:4px;stroke:var(--red)"><use href="#ic-search"/></svg>
+      Results for <strong>"${q.replace(/</g,'&lt;')}"</strong> — <span style="color:var(--red);font-weight:700">${res.length}</span> found
+    </div>
+    <button class="btn-filter-clear" onclick="clearSearch()"><svg width="13" height="13"><use href="#ic-x"/></svg> Clear Search</button>
+  </div>
+  ${res.length
+    ?`<div class="cards-grid">${res.map(r=>renderResourceCard(r)).join('')}</div>`
+    :`<div class="empty-state"><div class="empty-state-icon"><svg><use href="#ic-search"/></svg></div><h3>No results found for "${q}"</h3><p>Try different keywords like subject name, department, or resource type.</p></div>`
+  }`;
+}
+
+function clearSearch(){
+  searchActive=false;
+  document.getElementById('heroSearch').value='';
+  document.getElementById('searchClearBtn').style.display='none';
+  hideSuggestions();
+  document.getElementById('heroSection').style.display='block';
+  currentPublicTab='home';
+  document.querySelectorAll('.nav-tab').forEach((b,i)=>{if(i===0)b.classList.add('active');else b.classList.remove('active');});
+  renderPublicContent();
+}
+
+// Close suggestions when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.hero-search'))hideSuggestions();
+});
+
+// ====================== STATS ======================
+function updateHeroStats(){
+  const res=getData('resources',[]);
+  const depts=getData('depts',[]);
+  const sems=getData('sems',[]);
+  const statRes=document.getElementById('statResources');
+  const statDepts=document.getElementById('statDepts');
+  const statSems=document.getElementById('statSems');
+  if(statRes)statRes.textContent=res.length;
+  if(statDepts)statDepts.textContent=depts.length;
+  if(statSems)statSems.textContent=sems.length;
+}
+
+// ====================== TOAST ======================
+function showToast(msg,type=''){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className='toast '+(type||'');
+  const icon=type==='success'?`<svg><use href="#ic-check"/></svg>`:type==='error'?`<svg><use href="#ic-x"/></svg>`:`<svg><use href="#ic-info"/></svg>`;
+  t.innerHTML=icon+msg;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.animation='fadeOut 0.3s forwards';setTimeout(()=>t.remove(),300)},4000);
+}
+
+// ====================== INIT ======================
+document.getElementById('loginId').addEventListener('keyup',e=>{if(e.key==='Enter')document.getElementById('loginPwd').focus()});
+document.getElementById('loginPwd').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('queryModal').addEventListener('click',function(e){if(e.target===this)closeQueryModal()});
+
+// Hero search — Enter key triggers search (not auto)
+document.getElementById('heroSearch').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){triggerSearch();}
+  else if(e.key==='Escape'){hideSuggestions();}
+});
+
+// Start
+initData();
+</script>
+</body>
+</html>
