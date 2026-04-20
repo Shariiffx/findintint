@@ -710,14 +710,20 @@ async function getSearchSuggestions(query){
 
 // ====================== LOCAL DATA STORE (fallback + cache) ======================
 function getData(key,def){
-  // FIX: For resources, use in-memory data (has files) if available, else localStorage (metadata only)
-  if(key==='resources' && window._mongoResources && window._mongoResources.length) return window._mongoResources;
+  // Resources always come from memory (never localStorage - files too big)
+  if(key==='resources') return window._mongoResources || def;
   try{const v=localStorage.getItem('fit_'+key);return v?JSON.parse(v):def}catch{return def}
 }
-function setData(key,val){try{localStorage.setItem('fit_'+key,JSON.stringify(val))}catch(e){console.warn('localStorage full, skipping setData for',key);}}
+function setData(key,val){
+  // NEVER store resources in localStorage - files are too big (causes QuotaExceededError)
+  if(key==='resources') return;
+  try{localStorage.setItem('fit_'+key,JSON.stringify(val))}catch(e){console.warn('localStorage full for',key);}
+}
 
 // ====================== INIT & SEED ======================
 async function initData(){
+  // Clear any old resource data stuck in localStorage from previous version
+  try{ localStorage.removeItem('fit_resources'); }catch(e){}
   // Seed defaults if never set
   if(!getData('depts_init',false)){
     setData('depts',['Computer Science','Information Technology','Electronics','Mechanical','Civil','BCA','MCA']);
@@ -999,10 +1005,9 @@ async function doUpload(){
     if(result && result.insertedId){
       newRes._id = result.insertedId;
     }
-    // Also save locally
-    const res=getData('resources',[]);
-    res.push(newRes);
-    setData('resources',res);
+    // Save to in-memory store (not localStorage - files too big)
+    if(!window._mongoResources) window._mongoResources = [];
+    window._mongoResources.unshift(newRes);
     document.getElementById('uploadBar').style.width='100%';
     document.getElementById('uploadStatus').textContent='✅ Uploaded successfully!';
     updateHeroStats();
@@ -1086,7 +1091,7 @@ async function deleteResource(id){
   if(!confirm('Delete this resource? This cannot be undone.'))return;
   // FIX: filter by the string id field we set, not MongoDB's _id
   await mongoDeleteOne('resources',{id:String(id)});
-  setData('resources',getData('resources',[]).filter(r=>String(r.id)!==String(id)));
+  if(window._mongoResources) window._mongoResources = window._mongoResources.filter(r=>String(r.id)!==String(id));
   updateHeroStats();
   showAdminPanel('resources',document.querySelector('[data-panel="resources"]'));
   showToast('Resource deleted','success');
