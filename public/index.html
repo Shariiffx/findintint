@@ -722,7 +722,7 @@ async function initData(){
     setData('categories',['Syllabus','Book PDF','CA2 Question','Semester Question','Assignment','Notes','Previous Question','Lab Manual','Academic Calendar','Holiday List','Upcoming Event','Other']);
     setData('depts_init',true);
   }
-  // Try to load from MongoDB
+  // Always sync from MongoDB on every page load so all devices see latest data
   await syncFromMongo();
 }
 
@@ -736,7 +736,7 @@ async function syncFromMongo(){
       mongoFind('users',{},{},100),
       mongoFind('settings',{},{},10)
     ]);
-    // FIX: Convert MongoDB _id (ObjectId) to plain string for localStorage compatibility
+    // Convert MongoDB _id (ObjectId) to plain string for localStorage compatibility
     const toId = doc => doc.id || (doc._id ? doc._id.toString() : 'id_'+Date.now());
     if(resources.length) setData('resources', resources.map(r=>({...r,id:toId(r),_id:undefined})));
     if(events.length) setData('events', events.map(e=>({...e,id:toId(e),_id:undefined})));
@@ -758,10 +758,12 @@ async function syncFromMongo(){
     }
     // Sync settings (depts, sems, years, cats)
     settings.forEach(s=>{if(s.key && s.value) setData(s.key, s.value);});
+    console.log('✅ Synced from MongoDB: resources='+resources.length+' users='+users.length);
   }catch(e){
     console.warn('MongoDB sync failed, using local data',e);
   } finally {
     showGlobalLoader(false);
+    // FIX: Always re-render AFTER data is saved so page shows DB content
     updateHeroStats();
     renderPublicContent();
   }
